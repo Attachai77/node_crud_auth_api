@@ -2,13 +2,14 @@ const { Router } = require('express')
 const TokenMiddleware = require('../middleware/token')
 
 const UserMiddleware = require('../middleware/user.middleware')
+const UserValidate = require('../middleware/validator/user.validate')
 const UserModel = require('../model/user.model')
 
 const router = new Router()
 
 
 //read
-router.get('/', TokenMiddleware.verifyToken(), async (req,res) => {
+router.get('/',   TokenMiddleware.verifyToken(), async (req,res) => {
     // res.send('555555555555555555');
     // res.json({
     //     ddd:6666
@@ -40,7 +41,7 @@ router.get('/:id', TokenMiddleware.verifyToken(), async (req,res) => {
 })
 
 //create
-router.post ('/', TokenMiddleware.verifyToken(), UserMiddleware.checkUser() , async (req,res) => {
+router.post ('/', UserValidate.validateUserForm(), TokenMiddleware.verifyToken(), UserMiddleware.checkUser() , async (req,res) => {
     const { username , password ,email , age  } = req.body 
     await UserModel.CreateUser(username , password ,email , age)
     res.json({
@@ -50,7 +51,7 @@ router.post ('/', TokenMiddleware.verifyToken(), UserMiddleware.checkUser() , as
 })
 
 //update
-router.patch('/:id', TokenMiddleware.verifyToken(), async (req,res) => {
+router.patch('/:id', UserValidate.validateUserFormUpdate(), TokenMiddleware.verifyToken(), async (req,res) => {
     await UserModel.updateUser(req.params.id , req.body.email, req.body.age)
     res.json({
         status:200,
